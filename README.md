@@ -32,7 +32,7 @@ server {
 # the port your site will be served on
 listen      80;
 # the domain name it will serve for
-server_name 你的ip地址 ; # substitute your machine's IP address or FQDN
+server_name 你的nginx运行的本机ip地址 ; # substitute your machine's IP address or FQDN
 charset     utf-8;
 
 # max upload size
@@ -53,3 +53,46 @@ location / {
     include     uwsgi_params; # the uwsgi_params file you installed
 }
 }
+
+8.将该配置文件加入到nginx的启动配置文件中
+  sudo ln -s 你的目录/Mxonline/conf/nginx/uc_nginx.conf /etc/nginx/conf.d/
+  
+9.在django的setting文件中，添加下面一行内容：
+　STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+　运行命令
+　python manage.py collectstatic
+
+10.运行nginx
+sudo /usr/sbin/nginx
+这里需要注意 一定是直接用nginx命令启动， 不要用systemctl启动nginx不然会有权限问题
+
+11.通过配置文件启动uwsgi
+新建uwsgi.ini 配置文件， 内容如下：
+
+# mysite_uwsgi.ini file
+[uwsgi]
+
+# Django-related settings
+# the base directory (full path)
+chdir           = 你的Django目录
+# Django's wsgi file
+module          = MxOnline.wsgi
+# the virtualenv (full path)
+
+# process-related settings
+# master
+master          = true
+# maximum number of worker processes
+processes       = 10
+# the socket (use the full path to be safe
+socket          = 127.0.0.1:8000
+# ... with appropriate permissions - may be needed
+# chmod-socket    = 664
+# clear environment on exit
+vacuum          = true
+virtualenv = 你的virtualenv目录
+
+
+12.启动uWSGI
+uwsgi -i 你的目录/uwsgi.ini
+

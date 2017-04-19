@@ -15,7 +15,7 @@
 5.安装 uwsgi
   pip install uwsgi
 
-6.测试 uwsgi
+6.测试 uwsgi (进入Django项目子目录)
   uwsgi --http :8000 --module MxOnline.wsgi
   
 7.配置 nginx
